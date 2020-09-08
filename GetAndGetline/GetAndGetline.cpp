@@ -1,10 +1,8 @@
-﻿// MyCppPitfalls.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
-//
-
+﻿
 #include "GetAndGetline.hpp"
 
 int main() {
-	std::cout << "Hello MyCppPitfalls!\n";
+	std::cout << "Hello GetAndGetline!\n";
 
 	// testGet();
 
