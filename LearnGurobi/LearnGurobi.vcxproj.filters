@@ -3,7 +3,4 @@
   <ItemGroup>
     <ClInclude Include="LearnGurobi.hpp" />
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="LearnGurobi.cpp" />
-  </ItemGroup>
 </Project>

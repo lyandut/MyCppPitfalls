@@ -157,9 +157,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="LearnGurobi.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="LearnGurobi.hpp">
       <SubType>
       </SubType>
