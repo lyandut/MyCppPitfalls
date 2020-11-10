@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "LearnMetis"
+		},
+		{
+			"path": "LearnSmartptr"
 		}
 	],
 	"settings": {}
