@@ -6,60 +6,99 @@
 
 using namespace std;
 
-/* 程序使用动态内存场景：
-1. 程序不知道自己要使用多少对象 ===> 容器类
-2. 程序不知道所需对象的准确类型 ===> 容器中放置（智能）指针而非对象
-3. 程序需要在多个对象间共享数据 ===> （智能）指针成员
+static vector<Point> r_points{ {0,0},{0,5},{5,5},{5,0} };
+static coord_t r_width = 5, r_height = 5;
+static vector<Point> c_points{ {0,0} };
+static coord_t c_radius = 5;
+
+/*
+1. 正确定义智能指针
 */
+void case_1() {
+
+	// 1. make_shared: 最安全的分配和使用动态内存的方法
+	shared_ptr<Rect> p1 = make_shared<Rect>(r_points, r_width, r_height);
+
+	Rect rect_2(r_points, r_width, r_height);
+	shared_ptr<Rect> p2 = make_shared<Rect>(rect_2);
+
+	// 2. shared_ptr和new结合使用
+	shared_ptr<Rect> p3(new Rect(r_points, r_width, r_height));
+
+	Rect *x = new Rect(r_points, r_width, r_height);
+	shared_ptr<Rect> p4(x);
+	x = nullptr;
+
+	// 3. 错误用法
+	// 3.1 必须直接初始化，不能从raw指针隐式转换
+	//shared_ptr<Rect> p5 = new Rect(r_points, r_width, r_height); // !!!
+
+	// 3.2 将智能指针绑定到非动态分配的内存上
+	Rect rect_6(r_points, r_width, r_height);
+	//shared_ptr<Rect> p6(&rect_6); // !!!
+	shared_ptr<Rect> p6(&rect_6, [](Rect*) {});
+
+	// 3.3 一份内存托管给多个智能指针
+	Rect *xx = new Rect(r_points, r_width, r_height);
+	shared_ptr<Rect> p7(xx);
+	{
+		//shared_ptr<Rect> p8(xx); // !!!
+		shared_ptr<Rect> p8(xx, [](Rect*) {});
+		//shared_ptr<Rect> p9(p7.get()); // !!!
+		shared_ptr<Rect> p9(p7.get(), [](Rect*) {});
+	}
+	xx = nullptr;
+	Rect rect_7 = *p7;
+
+}
+
+/*
+2. 智能指针的使用：
+   程序需要在多个对象间共享数据 ===>（智能）指针成员
+*/
+void case_2() {
+
+	Rect rect_1(r_points, r_width, r_height);
+	cout << "rect_1 points成员地址: " << rect_1._points.get() << endl;
+	cout << "rect_1 points引用计数: " << rect_1._points.use_count() << endl;
+
+	Rect rect_2 = rect_1;
+	cout << "rect_2 points成员地址: " << rect_2._points.get() << endl;
+	cout << "rect_2 points引用计数: " << rect_2._points.use_count() << endl;
+
+}
+
+/*
+3. 智能指针的使用：
+   程序不知道所需对象的准确类型 ===> 容器中放置（智能）指针而非对象
+   智能指针下行转换 ===> 必须使用dynamic_pointer_cast，且基类必须是多态类型（包含虚函数）
+*/
+void case_3() {
+
+	vector<polygon_ptr> polygon_ptrs;
+	polygon_ptrs.push_back(make_shared<Rect>(r_points, r_width, r_height));
+	polygon_ptrs.push_back(make_shared<Circle>(c_points, c_radius));
+
+	//auto rect = dynamic_cast<Rect*>(polygon_ptrs.front()); // compile error
+	//auto rect = dynamic_cast<rect_ptr>(polygon_ptrs.front()); // compile error
+	auto rect = dynamic_pointer_cast<Rect>(polygon_ptrs.front()); // compile success
+	cout << "polygon_ptrs.front() shape: " << rect->shape() << " area: " << rect->area() << endl;
+	auto circle = dynamic_pointer_cast<Circle>(polygon_ptrs.back());
+	cout << "polygon_ptrs.back() shape: " << circle->shape() << " area: " << circle->area() << endl;
+
+}
+
 
 int main() {
 	std::cout << "Hello Smartptr!\n";
 
-	vector<Point> r_points{ {0,0},{0,5},{5,5},{5,0} };
-	coord_t r_width = 5, r_height = 5;
-	vector<Point> c_points{ {0,0} };
-	coord_t c_radius = 5;
+	case_1();
 
-	vector<polygon_ptr> polygon_ptrs;
+	case_2();
 
-	/*
-	1. rect._points、polygon_ptrs[0]->_points互为拷贝，共享数据。
-	2. new/make_shared会调用构造函数初始化一个新对象，因此不共享points。
-	*/
-	Rect rect(r_points, r_width, r_height);
-	cout << "rect points成员地址:\t\t" << rect._points.get() << endl;
-	cout << "rect points引用计数:\t\t" << rect._points.use_count() << endl;
-	polygon_ptrs.push_back(make_shared<Rect>(rect));
-	cout << "polygon_ptrs[0] points成员地址:\t" << polygon_ptrs.back()->_points.get() << endl;
-	cout << "polygon_ptrs[0] points引用计数:\t" << polygon_ptrs.back()->_points.use_count() << endl;
-	polygon_ptrs.push_back(make_shared<Rect>(r_points, r_width, r_height));
-	cout << "polygon_ptrs[1] points成员地址:\t" << polygon_ptrs.back()->_points.get() << endl;
-	cout << "polygon_ptrs[1] points引用计数:\t" << polygon_ptrs.back()->_points.use_count() << endl;
-	polygon_ptrs.emplace_back(new Rect(r_points, r_width, r_height));
-	cout << "polygon_ptrs[2] points成员地址:\t" << polygon_ptrs.back()->_points.get() << endl;
-	cout << "polygon_ptrs[2] points引用计数:\t" << polygon_ptrs.back()->_points.use_count() << endl;
+	case_3();
 
-	/*
-	3. 下面是一种错误的动态内存分配方式：
-	   现象：编译正确运行错误，调用emplace_back没有递增引用计数，调用pop_back/erase会报错。
-	   解析：rect指向的内存被rect和polygon_ptrs同时管理，会析构两次。不能析构一个并没有指向动态分配的内存空间的指针，
-	         只有将动态分配的对象指针(new/make_shared)托管给shared_ptr才是有意义的，
-	*/
-	//polygon_ptrs.emplace_back(&rect);
-	//cout << "polygon_ptrs.emplace_back(&rect) points成员地址:\t" << polygon_ptrs.back()->_points.get() << endl;
-	//cout << "polygon_ptrs.emplace_back(&rect) points引用计数:\t" << polygon_ptrs.back()->_points.use_count() << endl;
-	//polygon_ptrs.pop_back();
-
-	/*
-	4. 智能指针必须使用dynamic_pointer_cast下行转换。
-	5. 基类必须包含虚函数，即基类是多态类型。
-	*/
-	polygon_ptrs.push_back(make_shared<Circle>(c_points, c_radius));
-	//auto circle = dynamic_cast<Circle *>(polygon_ptrs.back());     // compile error
-	//auto circle = dynamic_cast<circle_ptr>(polygon_ptrs.back());   // compile error
-	auto circle = dynamic_pointer_cast<Circle>(polygon_ptrs.back()); // compile success
-	cout << "polygon_ptrs[3] shape:\t\t" << circle->shape() << endl;
-	cout << "polygon_ptrs[3] area:\t\t" << circle->area() << endl;
+	system("pause");
 
 	return 0;
 }

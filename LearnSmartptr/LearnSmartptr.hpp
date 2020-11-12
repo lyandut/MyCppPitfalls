@@ -22,14 +22,14 @@ struct Point { coord_t x, y; };
 class Polygon {
 public:
 	Polygon(const vector<Point> &points) :
-		_points(make_shared<vector<Point>>(points)) {}
+		_points(make_shared<const vector<Point>>(points)) {}
 
 	virtual string shape() const = 0;
 
 	virtual coord_t area() const = 0;
 
 public:
-	const shared_ptr<vector<Point>> _points;
+	const shared_ptr<const vector<Point>> _points;
 };
 
 class Rect final : public Polygon {
