@@ -12,7 +12,7 @@ static vector<Point> c_points{ {0,0} };
 static coord_t c_radius = 5;
 
 /*
-1. 正确定义智能指针
+一、正确定义智能指针
 */
 void case_1() {
 
@@ -29,16 +29,15 @@ void case_1() {
 	shared_ptr<Rect> p4(x);
 	x = nullptr;
 
-	// 3. 错误用法
-	// 3.1 必须直接初始化，不能从raw指针隐式转换
+	// 3. 必须直接初始化，不能从raw指针隐式转换
 	//shared_ptr<Rect> p5 = new Rect(r_points, r_width, r_height); // !!!
 
-	// 3.2 将智能指针绑定到非动态分配的内存上
+	// 4. 将非动态分配的内存托管给智能指针
 	Rect rect_6(r_points, r_width, r_height);
 	//shared_ptr<Rect> p6(&rect_6); // !!!
 	shared_ptr<Rect> p6(&rect_6, [](Rect*) {});
 
-	// 3.3 一份内存托管给多个智能指针
+	// 5. 将同一份动态内存托管给多个智能指针
 	Rect *xx = new Rect(r_points, r_width, r_height);
 	shared_ptr<Rect> p7(xx);
 	{
@@ -53,8 +52,8 @@ void case_1() {
 }
 
 /*
-2. 智能指针的使用：
-   程序需要在多个对象间共享数据 ===>（智能）指针成员
+二、智能指针的使用：
+    程序需要在多个对象间共享数据 ===>（智能）指针成员
 */
 void case_2() {
 
@@ -69,9 +68,9 @@ void case_2() {
 }
 
 /*
-3. 智能指针的使用：
-   程序不知道所需对象的准确类型 ===> 容器中放置（智能）指针而非对象
-   智能指针下行转换 ===> 必须使用dynamic_pointer_cast，且基类必须是多态类型（包含虚函数）
+三、智能指针的使用：
+    程序不知道所需对象的准确类型 ===> 容器中放置（智能）指针而非对象
+    智能指针下行转换 ===> 必须使用dynamic_pointer_cast，且基类必须是多态类型（包含虚函数）
 */
 void case_3() {
 
