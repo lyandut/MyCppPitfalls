@@ -24,9 +24,7 @@ public:
 	Polygon(const vector<Point> &points) :
 		_points(make_shared<const vector<Point>>(points)) {}
 
-	virtual string shape() const = 0;
-
-	virtual coord_t area() const = 0;
+	virtual ~Polygon() {}
 
 public:
 	const shared_ptr<const vector<Point>> _points;
