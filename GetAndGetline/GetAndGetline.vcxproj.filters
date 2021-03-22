@@ -4,6 +4,6 @@
     <ClInclude Include="GetAndGetline.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GetAndGetline.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
 </Project>

@@ -75,6 +75,5 @@ int main() {
 	}
 	outpartition.close();
 
-	system("pause");
 	return 0;
 }

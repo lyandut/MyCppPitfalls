@@ -97,7 +97,5 @@ int main() {
 
 	case_3();
 
-	system("pause");
-
 	return 0;
 }

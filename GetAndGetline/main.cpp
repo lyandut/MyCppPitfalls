@@ -14,7 +14,5 @@ int main() {
 
 	testGetlineAndIstream();
 
-	system("PAUSE");
-
 	return 0;
 }

@@ -21,7 +21,5 @@ int main() {
 	cout << square.equal(ref_to_square) << endl;
 	cout << (rect == square) << endl;
 
-	system("pause");
-
 	return 0;
 }
