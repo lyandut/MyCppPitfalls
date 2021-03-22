@@ -1,4 +1,4 @@
 # ignore all except .gitignore file
 *
 !.gitignore
-!metis.lib
+!metis*.lib

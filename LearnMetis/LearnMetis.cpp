@@ -62,8 +62,8 @@ int main() {
 	xadj.push_back(adjncy.size());
 	ingraph.close();
 
-	//vector<idx_t> part = func(xadj, adjncy, adjwgt, METIS_PartGraphRecursive);
-	vector<idx_t> part = func(xadj, adjncy, adjwgt, METIS_PartGraphKway);
+	vector<idx_t> part = func(xadj, adjncy, adjwgt, METIS_PartGraphRecursive);
+	//vector<idx_t> part = func(xadj, adjncy, adjwgt, METIS_PartGraphKway);
 
 	ofstream outpartition("partition.txt");
 	if (!outpartition) {

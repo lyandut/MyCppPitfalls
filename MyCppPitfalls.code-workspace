@@ -4,13 +4,16 @@
 			"path": "GetAndGetline"
 		},
 		{
-			"path": "LearnGurobi"
-		},
-		{
 			"path": "LearnMetis"
 		},
 		{
 			"path": "LearnSmartptr"
+		},
+		{
+			"path": "PriorityQueue"
+		},
+		{
+			"path": "RTTI101"
 		}
 	],
 	"settings": {}
