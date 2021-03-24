@@ -20,7 +20,10 @@ struct Vertex {
 
 	Vertex() : id(-1), dist(INF) {}
 	Vertex(int i, int d) : id(i), dist(d) {}
-	bool operator<(const Vertex& rhs) const { return dist < rhs.dist; }
+	bool operator<(const Vertex& rhs) const {
+		if (dist == rhs.dist) return id < rhs.id;
+		return dist < rhs.dist;
+	}
 };
 
 
@@ -30,6 +33,7 @@ struct Vertex {
    个人感觉STL默认大顶堆有点反人类...
 */
 std::function<bool(const Vertex&, const Vertex&)> comp1 = [](const Vertex& lhs, const Vertex& rhs) {
+	if (lhs.dist == rhs.dist) return lhs.id > rhs.id;
 	return lhs.dist > rhs.dist;
 };
 using PriorityQueue1 = std::priority_queue<Vertex, std::vector<Vertex>, decltype(comp1)>;
@@ -41,6 +45,7 @@ using PriorityQueue1 = std::priority_queue<Vertex, std::vector<Vertex>, decltype
    同样要求元素支持比较函数.
 */
 auto comp2 = [](auto& lhs, auto& rhs) {
+	if (lhs.dist == rhs.dist) return lhs.id < rhs.id;
 	return lhs.dist < rhs.dist;
 };
 using PriorityQueue2 = std::set<Vertex, decltype(comp2)>;

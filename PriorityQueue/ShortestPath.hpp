@@ -34,7 +34,7 @@ public:
 		dist.clear();
 		dist.resize(v_num, INF);
 		dist[s] = 0;
-		PriorityQueue1 q(comp1);
+		PriorityQueue1 q(comp1); // 小顶堆
 		q.emplace(s, 0);
 		while (!q.empty()) {
 			auto curr = q.top();
@@ -61,14 +61,20 @@ public:
 		PriorityQueue2 q(comp2);
 		q.emplace(s, 0);
 		while (!q.empty()) {
-			auto curr = *q.begin();
+			auto curr = *q.begin(); // 当前最短路径出队并删除
 			q.erase(q.begin());
-			if (curr.id == t) { break; }
+			if (curr.id == t) { break; } // 最短路径！
 			for (auto& e : adj[curr.id]) {
 				if (curr.dist + e.w < dist[e.tid]) {
-					predecessor[e.tid] = curr.id;
+					predecessor[e.tid] = curr.id; // 记录前驱节点
 					dist[e.tid] = curr.dist + e.w;
-					q.emplace(e.tid, dist[e.tid]);
+					for (auto iter = q.begin(); iter != q.end(); ++iter) {
+						if (iter->id == e.tid) { // 如果在队列中则删除旧值
+							q.erase(iter);
+							break;
+						}
+					}
+					q.emplace(e.tid, dist[e.tid]); // 新值入队
 				}
 			}
 		}
@@ -85,16 +91,16 @@ public:
 		PriorityQueue3 q(v_num);
 		q.add({ s, 0 });
 		vector<bool> visited(v_num, false);
-		visited[s] = true;
+		visited[s] = true; // 标记是否在队列中
 		while (!q.empty()) {
 			auto curr = q.poll();
-			if (curr.id == t) { break; }
+			if (curr.id == t) { break; } // 最短路径！
 			for (auto& e : adj[curr.id]) {
 				if (dist[curr.id] + e.w < dist[e.tid]) {
 					predecessor[e.tid] = curr.id;
 					dist[e.tid] = dist[curr.id] + e.w;
 					if (visited[e.tid]) {
-						q.update({ e.tid, dist[e.tid] });
+						q.update({ e.tid, dist[e.tid] }); // 如果在队列中则更新dist值
 					}
 					else {
 						q.add({ e.tid, dist[e.tid] });
