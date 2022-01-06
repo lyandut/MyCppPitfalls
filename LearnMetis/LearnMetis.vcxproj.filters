@@ -10,10 +10,16 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="graph.txt">
+    <Text Include="graph_b.txt">
       <Filter>资源文件</Filter>
     </Text>
-    <Text Include="partition.txt">
+    <Text Include="graph_c.txt">
+      <Filter>资源文件</Filter>
+    </Text>
+    <Text Include="partition_b.txt">
+      <Filter>资源文件</Filter>
+    </Text>
+    <Text Include="partition_c.txt">
       <Filter>资源文件</Filter>
     </Text>
   </ItemGroup>

@@ -7,7 +7,7 @@
 
 using namespace std;
 
-vector<idx_t> func(vector<idx_t> &xadj, vector<idx_t> &adjncy, vector<idx_t> &adjwgt, decltype(METIS_PartGraphKway) *METIS_PartGraphFunc) {
+vector<idx_t> func(vector<idx_t>& xadj, vector<idx_t>& adjncy, vector<idx_t>& vwgt, vector<idx_t>& adjwgt, decltype(METIS_PartGraphKway)* METIS_PartGraphFunc) {
 	idx_t nVertices = xadj.size() - 1; // 节点数
 	idx_t nEdges = adjncy.size() / 2;  // 边数
 	idx_t nWeights = 1;                // 节点权重维数
@@ -20,7 +20,7 @@ vector<idx_t> func(vector<idx_t> &xadj, vector<idx_t> &adjncy, vector<idx_t> &ad
 		If a small number of partitions is desired, the METIS_PartGraphRecursive should be used instead,
 		as it produces somewhat better partitions." */
 	int ret = METIS_PartGraphFunc(&nVertices, &nWeights, xadj.data(), adjncy.data(),
-		NULL, NULL, adjwgt.data(), &nParts, NULL,
+		vwgt.data(), NULL, adjwgt.data(), &nParts, NULL,
 		NULL, NULL, &objval, part.data());
 
 	if (ret != rstatus_et::METIS_OK) { cout << "METIS_ERROR" << endl; }
@@ -33,27 +33,37 @@ vector<idx_t> func(vector<idx_t> &xadj, vector<idx_t> &adjncy, vector<idx_t> &ad
 	return part;
 }
 
+enum FmtBit {
+	EDGE_WEIGHT = 0x0001,
+	VERTEX_WEIGHT = 0x0002,
+	VERTEX_SIZE = 0x0004
+};
+
 
 int main() {
-	ifstream ingraph("graph.txt");
+	ifstream ingraph("graph_c.txt");
 	if (!ingraph) {
 		cout << "打开文件失败！" << endl;
 		exit(1);
 	}
-	int vexnum, edgenum;
+	int vexnum, edgenum, fmt;
 	string line;
 	getline(ingraph, line);
 	istringstream tmp(line);
-	tmp >> vexnum >> edgenum;
+	tmp >> vexnum >> edgenum >> fmt;
 	vector<idx_t> xadj(0);
 	vector<idx_t> adjncy(0); // 压缩图表示
-	vector<idx_t> adjwgt(0); // 节点权重
+	vector<idx_t> vwgt(0);   // 节点权重
+	vector<idx_t> adjwgt(0); // 边权重
 
-	idx_t a, w;
+	idx_t v, a, w;
 	for (int i = 0; i < vexnum; i++) {
 		xadj.push_back(adjncy.size());
 		getline(ingraph, line);
 		istringstream tmp(line);
+		if (fmt & FmtBit::VERTEX_WEIGHT && tmp >> v) {
+			vwgt.push_back(v);
+		}
 		while (tmp >> a >> w) {
 			adjncy.push_back(a - 1); // 节点id从0开始
 			adjwgt.push_back(w);
@@ -62,10 +72,10 @@ int main() {
 	xadj.push_back(adjncy.size());
 	ingraph.close();
 
-	vector<idx_t> part = func(xadj, adjncy, adjwgt, METIS_PartGraphRecursive);
-	//vector<idx_t> part = func(xadj, adjncy, adjwgt, METIS_PartGraphKway);
+	vector<idx_t> part = func(xadj, adjncy, vwgt, adjwgt, METIS_PartGraphRecursive);
+	//vector<idx_t> part = func(xadj, adjncy, vwgt, adjwgt, METIS_PartGraphKway);
 
-	ofstream outpartition("partition.txt");
+	ofstream outpartition("partition_c.txt");
 	if (!outpartition) {
 		cout << "打开文件失败！" << endl;
 		exit(1);

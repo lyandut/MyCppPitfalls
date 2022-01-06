@@ -160,8 +160,10 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="graph.txt" />
-    <Text Include="partition.txt" />
+    <Text Include="graph_b.txt" />
+    <Text Include="graph_c.txt" />
+    <Text Include="partition_b.txt" />
+    <Text Include="partition_c.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
